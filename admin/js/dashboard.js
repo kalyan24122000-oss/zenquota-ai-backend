@@ -79,6 +79,7 @@ function loadSectionData(section) {
     case 'overview': loadStats(); break;
     case 'users': loadUsers(); break;
     case 'recharge': loadRechargeUsers(); break;
+    case 'requests': loadRechargeRequests(); break;
     case 'codes': loadCodes(); break;
   }
 }
@@ -226,6 +227,44 @@ document.getElementById('rechargeBtn').addEventListener('click', async () => {
 
   btn.disabled = false;
 });
+
+// ─── Recharge Requests ───
+async function loadRechargeRequests() {
+  const data = await apiCall('/admin/recharge-requests');
+  if (!data || !data.success) return;
+
+  const tbody = document.getElementById('requestsTable');
+  if (data.requests.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:32px;color:var(--text-muted);">No pending requests</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.requests.map(r => `
+    <tr>
+      <td>#${r.id}</td>
+      <td>${r.user_id}</td>
+      <td>${r.user_email || 'N/A'}</td>
+      <td style="font-weight:bold;color:var(--accent-green);">₹${r.amount}</td>
+      <td>${new Date(r.created_at).toLocaleString()}</td>
+      <td>
+        <button class="btn btn-success btn-sm" onclick="processRequest(${r.id}, 'approve')" style="margin-right:8px;">✅ Approve</button>
+        <button class="btn btn-secondary btn-sm" onclick="processRequest(${r.id}, 'reject')">❌ Reject</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function processRequest(requestId, action) {
+  if (!confirm(`Are you sure you want to ${action} request #${requestId}?`)) return;
+
+  const data = await apiCall('/admin/approve-recharge', 'POST', { requestId, action });
+  if (data && data.success) {
+    showToast(data.message, 'success');
+    loadRechargeRequests();
+  } else {
+    showToast(data?.message || `Failed to ${action} request`, 'error');
+  }
+}
 
 // ─── Redeem Codes ───
 async function loadCodes() {

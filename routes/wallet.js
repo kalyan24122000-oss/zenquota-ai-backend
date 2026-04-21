@@ -154,4 +154,30 @@ router.post('/redeem-code', authenticateUser, (req, res) => {
   }
 });
 
+/**
+ * POST /api/request-recharge
+ */
+router.post('/request-recharge', authenticateUser, (req, res) => {
+  try {
+    const { amount } = req.body;
+    
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ success: false, message: 'Valid amount required' });
+    }
+
+    runSQL(
+      'INSERT INTO recharge_requests (user_id, amount, status) VALUES (?, ?, ?)',
+      [req.userId, amount, 'pending']
+    );
+
+    res.json({
+      success: true,
+      message: `Recharge request for ₹${amount} submitted to admin.`
+    });
+  } catch (error) {
+    console.error('Request recharge error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 module.exports = router;

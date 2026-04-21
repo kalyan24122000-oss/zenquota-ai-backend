@@ -224,4 +224,56 @@ router.get('/codes', authenticateAdmin, (req, res) => {
   }
 });
 
+/**
+ * GET /api/admin/recharge-requests
+ */
+router.get('/recharge-requests', authenticateAdmin, (req, res) => {
+  try {
+    const requests = getAll(`
+      SELECT r.*, u.email as user_email
+      FROM recharge_requests r
+      LEFT JOIN users u ON r.user_id = u.id
+      WHERE r.status = 'pending'
+      ORDER BY r.created_at DESC
+    `);
+    res.json({ success: true, requests });
+  } catch (error) {
+    console.error('Admin get recharge requests error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+/**
+ * POST /api/admin/approve-recharge
+ */
+router.post('/approve-recharge', authenticateAdmin, (req, res) => {
+  try {
+    const { requestId, action } = req.body;
+    
+    if (!requestId || !['approve', 'reject'].includes(action)) {
+      return res.status(400).json({ success: false, message: 'Valid request ID and action required' });
+    }
+
+    const request = getOne('SELECT * FROM recharge_requests WHERE id = ?', [requestId]);
+    if (!request || request.status !== 'pending') {
+      return res.status(404).json({ success: false, message: 'Request not found or already processed' });
+    }
+
+    if (action === 'approve') {
+      runSQL('UPDATE users SET wallet_balance = wallet_balance + ? WHERE id = ?', [request.amount, request.user_id]);
+      runSQL(
+        'INSERT INTO transactions (user_id, type, amount, description) VALUES (?, ?, ?, ?)',
+        [request.user_id, 'credit', request.amount, `Recharge request approved for ₹${request.amount}`]
+      );
+    }
+    
+    runSQL('UPDATE recharge_requests SET status = ? WHERE id = ?', [action === 'approve' ? 'approved' : 'rejected', requestId]);
+
+    res.json({ success: true, message: `Request ${action}d successfully` });
+  } catch (error) {
+    console.error('Admin approve recharge error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
 module.exports = router;

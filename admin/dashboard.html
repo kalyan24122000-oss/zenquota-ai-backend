@@ -29,6 +29,10 @@
           <span class="icon">💰</span>
           <span>Recharge</span>
         </button>
+        <button class="nav-item" data-section="requests" id="nav-requests">
+          <span class="icon">📥</span>
+          <span>Requests</span>
+        </button>
         <button class="nav-item" data-section="codes" id="nav-codes">
           <span class="icon">🎟️</span>
           <span>Redeem Codes</span>
@@ -200,6 +204,36 @@
                 </thead>
                 <tbody id="rechargeUsersTable">
                   <tr><td colspan="4" class="text-center" style="padding:32px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ REQUESTS SECTION ═══════════ -->
+      <section class="section" id="section-requests">
+        <div class="page-header">
+          <h2>Recharge Requests</h2>
+          <p>Pending wallet recharge requests from users</p>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Request ID</th>
+                    <th>User ID</th>
+                    <th>User Email</th>
+                    <th>Amount</th>
+                    <th>Requested At</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="requestsTable">
+                  <tr><td colspan="6" class="text-center" style="padding:32px;">Loading requests...</td></tr>
                 </tbody>
               </table>
             </div>
