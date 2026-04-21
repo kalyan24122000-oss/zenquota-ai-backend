@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZenQuota AI — Admin Dashboard</title>
+  <meta name="description" content="ZenQuota AI admin dashboard for managing users, wallets, and redeem codes">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <h1>🧠 ZenQuota AI</h1>
+        <span>Admin Panel</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-section="overview" id="nav-overview">
+          <span class="icon">📊</span>
+          <span>Overview</span>
+        </button>
+        <button class="nav-item" data-section="users" id="nav-users">
+          <span class="icon">👥</span>
+          <span>Users</span>
+        </button>
+        <button class="nav-item" data-section="recharge" id="nav-recharge">
+          <span class="icon">💰</span>
+          <span>Recharge</span>
+        </button>
+        <button class="nav-item" data-section="codes" id="nav-codes">
+          <span class="icon">🎟️</span>
+          <span>Redeem Codes</span>
+        </button>
+        <button class="nav-item" data-section="settings" id="nav-settings">
+          <span class="icon">⚙️</span>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="admin-info">
+          Logged in as <span class="admin-name" id="adminName">admin</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width:100%;">
+          🚪 Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Toast Container -->
+      <div class="toast-container" id="toastContainer"></div>
+
+      <!-- ═══════════ OVERVIEW SECTION ═══════════ -->
+      <section class="section active" id="section-overview">
+        <div class="page-header">
+          <h2>Dashboard Overview</h2>
+          <p>Real-time statistics and recent activity</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value" id="statTotalUsers">-</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value" id="statVerifiedUsers">-</div>
+            <div class="stat-label">Verified Users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value" id="statTotalBalance">-</div>
+            <div class="stat-label">Total Wallet Balance</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🤖</div>
+            <div class="stat-value" id="statQuotesToday">-</div>
+            <div class="stat-label">Quotes Today</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎟️</div>
+            <div class="stat-value" id="statTotalCodes">-</div>
+            <div class="stat-label">Total Codes</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-value" id="statTransactions">-</div>
+            <div class="stat-label">Transactions</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Recent Transactions</h3>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Description</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="recentTransactions">
+                  <tr><td colspan="5" class="text-center" style="padding:32px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ USERS SECTION ═══════════ -->
+      <section class="section" id="section-users">
+        <div class="page-header">
+          <div class="flex-between">
+            <div>
+              <h2>User Management</h2>
+              <p>View and manage all registered users</p>
+            </div>
+            <div class="search-box">
+              <input type="text" id="userSearch" placeholder="Search by email...">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Wallet</th>
+                    <th>Bonus Quotes</th>
+                    <th>Today's Usage</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTable">
+                  <tr><td colspan="8" class="text-center" style="padding:32px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ RECHARGE SECTION ═══════════ -->
+      <section class="section" id="section-recharge">
+        <div class="page-header">
+          <h2>Wallet Recharge</h2>
+          <p>Add balance to user wallets</p>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="inline-form">
+              <div class="form-group">
+                <label>User ID</label>
+                <input type="number" id="rechargeUserId" class="form-input" placeholder="Enter user ID" min="1">
+              </div>
+              <div class="form-group">
+                <label>Amount (₹)</label>
+                <input type="number" id="rechargeAmount" class="form-input" placeholder="Enter amount" min="1">
+              </div>
+              <button class="btn btn-success" id="rechargeBtn" style="margin-bottom:0; height:48px;">
+                💰 Recharge Wallet
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-4">
+          <div class="card-header">
+            <h3>Quick Recharge — Select User</h3>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Current Balance</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="rechargeUsersTable">
+                  <tr><td colspan="4" class="text-center" style="padding:32px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ CODES SECTION ═══════════ -->
+      <section class="section" id="section-codes">
+        <div class="page-header">
+          <h2>Redeem Codes</h2>
+          <p>Generate and manage redeem codes</p>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="inline-form">
+              <div class="form-group">
+                <label>Quote Value</label>
+                <input type="number" id="codeValue" class="form-input" placeholder="10" value="10" min="1">
+              </div>
+              <div class="form-group">
+                <label>User ID (Optional)</label>
+                <input type="number" id="codeUserId" class="form-input" placeholder="Leave empty for general">
+              </div>
+              <button class="btn btn-primary" id="generateCodeBtn" style="margin-bottom:0; height:48px;">
+                🎟️ Generate Code
+              </button>
+            </div>
+
+            <div id="generatedCodeDisplay" class="hidden mt-4">
+              <p style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">Generated Code:</p>
+              <div class="code-display" id="generatedCode"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt-4">
+          <div class="card-header">
+            <h3>All Redeem Codes</h3>
+          </div>
+          <div class="card-body">
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Value</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Expires</th>
+                  </tr>
+                </thead>
+                <tbody id="codesTable">
+                  <tr><td colspan="6" class="text-center" style="padding:32px;">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════ SETTINGS SECTION ═══════════ -->
+      <section class="section" id="section-settings">
+        <div class="page-header">
+          <h2>Settings</h2>
+          <p>Manage admin credentials</p>
+        </div>
+
+        <div class="card" style="max-width:500px;">
+          <div class="card-header">
+            <h3>Change Password</h3>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label>Current Password</label>
+              <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password">
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="newPassword" class="form-input" placeholder="Enter new password">
+            </div>
+            <div class="form-group">
+              <label>Confirm New Password</label>
+              <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm new password">
+            </div>
+            <button class="btn btn-primary" id="changePasswordBtn" style="width:auto;">
+              🔒 Change Password
+            </button>
+          </div>
+        </div>
+
+        <div class="card mt-4" style="max-width:500px;">
+          <div class="card-header">
+            <h3>Server Info</h3>
+          </div>
+          <div class="card-body">
+            <table>
+              <tr><td style="font-weight:600;">App</td><td>ZenQuota AI</td></tr>
+              <tr><td style="font-weight:600;">Version</td><td>1.0.0</td></tr>
+              <tr><td style="font-weight:600;">Database</td><td>SQLite</td></tr>
+              <tr><td style="font-weight:600;">Backend</td><td>Node.js + Express</td></tr>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

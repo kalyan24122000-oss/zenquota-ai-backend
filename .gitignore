@@ -1,0 +1,6 @@
+node_modules/
+.env
+zenquota.db
+test_smtp.js
+*.log
+.DS_Store
